@@ -2,7 +2,7 @@
 
 static uint32_t dataPins[8];
 static uint8_t displayControlParameters;
-static char formatBuffer[LCD_COL_COUNT + 1];
+static char formatBuffer[HD44780_LCD_COL_COUNT + 1];
 
 static const uint8_t loadBarStartElement[8] = {0b10000, 0b11000, 0b11100, 0b11110, 0b11110, 0b11100, 0b11000, 0b10000};
 static const uint8_t loadBarProgressElement[8] = {0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111};
@@ -13,7 +13,7 @@ uint8_t barColLocation = 0;
 uint8_t barTotalLength = 0;
 uint8_t barProgress = 0;
 
-#ifdef USE_8_BIT_MODE
+#ifdef HD44780_USE_8_BIT_MODE
 
 void initLCDinEightBitMode() {
     dwtDelayInit();
@@ -67,7 +67,7 @@ void printLCDChar(unsigned char charData) {
 
 //-----------------------------------------------------------------------------
 
-#ifdef USE_4_BIT_MODE
+#ifdef HD44780_USE_4_BIT_MODE
 
 void initLCDinFourBitMode() {
     dwtDelayInit();
@@ -133,9 +133,9 @@ void printLCDChar(unsigned char charData) {
 
 
 void initLCD() {
-#ifdef USE_8_BIT_MODE            // Configure lcd for 8 bit mode
+#ifdef HD44780_USE_8_BIT_MODE            // Configure lcd for 8 bit mode
     initLCDinEightBitMode();
-#elif defined(USE_4_BIT_MODE)    // Configure lcd for 4 bit mode
+#elif defined(HD44780_USE_4_BIT_MODE)    // Configure lcd for 4 bit mode
     initLCDinFourBitMode();
 #endif
 
@@ -226,7 +226,7 @@ void disableAutoScrollLCD() {
 void goToXYLCD(uint8_t row, uint8_t pos) {
     static const uint8_t rowOffsets[] = {0x00, 0x40, 0x14, 0x54};
 
-    if (row < LCD_ROW_COUNT && pos < LCD_COL_COUNT) {
+    if (row < HD44780_LCD_ROW_COUNT && pos < HD44780_LCD_COL_COUNT) {
         commandLCD(LCD_SETDDRAMADDR | (pos + rowOffsets[row]));
     }
 }
@@ -246,7 +246,7 @@ void printfAtPositionLCD(uint8_t row, uint8_t pos, char *format, ...) {
     va_list args;
 
     va_start(args, format);
-    vsnprintf(formatBuffer, LCD_COL_COUNT + 1, format, args);
+    vsnprintf(formatBuffer, HD44780_LCD_COL_COUNT + 1, format, args);
     va_end(args);
 
     goToXYLCD(row, pos);
@@ -254,9 +254,9 @@ void printfAtPositionLCD(uint8_t row, uint8_t pos, char *format, ...) {
 }
 
 void cleanPrintAtPositionLCD(uint8_t row, uint8_t col, const char *string) {
-    char buffer[LCD_COL_COUNT] = {[0 ... LCD_COL_COUNT - 1] = ' '};
-    buffer[LCD_COL_COUNT - 1] = '\0';
-    for (uint8_t i = col, j = 0; i < LCD_COL_COUNT && string[j] != '\0'; i++, j++) {
+    char buffer[HD44780_LCD_COL_COUNT] = {[0 ... HD44780_LCD_COL_COUNT - 1] = ' '};
+    buffer[HD44780_LCD_COL_COUNT - 1] = '\0';
+    for (uint8_t i = col, j = 0; i < HD44780_LCD_COL_COUNT && string[j] != '\0'; i++, j++) {
         buffer[i] = string[j];
     }
     goToXYLCD(row, 0);
@@ -267,7 +267,7 @@ void cleanPrintfAtPositionLCD(uint8_t row, uint8_t col, char *format, ...) {
     va_list args;
 
     va_start(args, format);
-    vsnprintf(formatBuffer, LCD_COL_COUNT + 1, format, args);
+    vsnprintf(formatBuffer, HD44780_LCD_COL_COUNT + 1, format, args);
     va_end(args);
 
     cleanPrintAtPositionLCD(row, col, formatBuffer);
@@ -293,16 +293,16 @@ void printfLCD(char *format, ...) {
     va_list args;
 
     va_start(args, format);
-    vsnprintf(formatBuffer, LCD_COL_COUNT + 1, format, args);
+    vsnprintf(formatBuffer, HD44780_LCD_COL_COUNT + 1, format, args);
     va_end(args);
 
     printLCD(formatBuffer);
 }
 
 void cleanPrintLCD(const char *string) {
-    char buffer[LCD_COL_COUNT] = {[0 ... LCD_COL_COUNT - 1] = ' '};
-    buffer[LCD_COL_COUNT - 1] = '\0';
-    for (uint8_t i = 0; i < LCD_COL_COUNT && string[i] != '\0'; i++) {
+    char buffer[HD44780_LCD_COL_COUNT] = {[0 ... HD44780_LCD_COL_COUNT - 1] = ' '};
+    buffer[HD44780_LCD_COL_COUNT - 1] = '\0';
+    for (uint8_t i = 0; i < HD44780_LCD_COL_COUNT && string[i] != '\0'; i++) {
         buffer[i] = string[i];
     }
     printLCD(buffer);
@@ -312,15 +312,15 @@ void cleanPrintfLCD(char *format, ...) {
     va_list args;
 
     va_start(args, format);
-    vsnprintf(formatBuffer, LCD_COL_COUNT + 1, format, args);
+    vsnprintf(formatBuffer, HD44780_LCD_COL_COUNT + 1, format, args);
     va_end(args);
 
     cleanPrintLCD(formatBuffer);
 }
 
 void initProgressBar(uint8_t len, uint8_t row, uint8_t col) {
-    bool isBarLengthValid = (len <= LCD_COL_COUNT - 1) && ((len - 2) >= 0);
-    bool isRowValid = row < LCD_ROW_COUNT;
+    bool isBarLengthValid = (len <= HD44780_LCD_COL_COUNT - 1) && ((len - 2) >= 0);
+    bool isRowValid = row < HD44780_LCD_ROW_COUNT;
 
     if (isBarLengthValid && isRowValid) {
         createCustomCharLCD(0, loadBarStartElement);

@@ -21,13 +21,3 @@ set(HD44780_LCD_SOURCES
         ${HD44780_LCD_SOURCE_DIR}/${PROJECT_NAME}.c
         ${HD44780_LCD_SOURCE_DIR}/include/${PROJECT_NAME}.h
         CACHE STRING "HD44780 LCD source files include to the main project" FORCE)
-
-set(SOURCE_FILES
-        ${PROJECT_NAME}.c
-        include/${PROJECT_NAME}.h)
-
-add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-
-target_link_libraries(${PROJECT_NAME} DWT_Delay)
-target_include_directories(${PROJECT_NAME} PUBLIC ${HD44780_LCD_DIRECTORY})

@@ -4,32 +4,23 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "main.h"
 #include "DWT_Delay.h"
 
-/*
-* Library HD44780_LCD usage:
-* In HD44780_LCD.h
-* 1. Set display type(16x2, 20x4), by default 16x2
-* 2. Uncomment LCD working mode(USE_8_BIT_MODE or USE_4_BIT_MODE, but not both). By default configured for 4 bit mode.
-* 3. Set preferred ports(or use defaults) in LCD mode block
-* 4. In your main class:
-	initLCD(); // by default 2 lines is initialized, cursor is not showing and writing from left to right
-	then you start use LCD
-*/
 
-//#define USE_8_BIT_MODE		// define LCD working mode
-#define USE_4_BIT_MODE
+//#define HD44780_USE_8_BIT_MODE		// define LCD working mode
+#define HD44780_USE_4_BIT_MODE
 
-#define LCD_COL_COUNT 16
-#define LCD_ROW_COUNT 2
+#if !defined(HD44780_LCD_COL_COUNT) || !defined(HD44780_LCD_ROW_COUNT)
+#define HD44780_LCD_COL_COUNT 16
+#define HD44780_LCD_ROW_COUNT 2
+#endif
 
-#if !defined(USE_8_BIT_MODE) && !defined(USE_4_BIT_MODE)
+#if !defined(HD44780_USE_8_BIT_MODE) && !defined(HD44780_USE_4_BIT_MODE)
 #warning "LCD mode is not defined. By default 4 bit mode will be used"
 #define USE_4_BIT_MODE
 #endif
 
-#if defined(USE_8_BIT_MODE) && defined(USE_4_BIT_MODE)
+#if defined(HD44780_USE_8_BIT_MODE) && defined(HD44780_USE_4_BIT_MODE)
 #error "LCD mode settings is incorrect. Should be set only four(USE_4_BIT_MODE) or eight(USE_8_BIT_MODE) bit mode only"
 #endif
 
@@ -53,7 +44,7 @@ D7    PB7               Data 7
 A     +3V3              Back light positive power
 K     GND               Ground for back light
 */
-#if defined(USE_8_BIT_MODE)			// if not redefined, then default ports will be used for 8 bit mode
+#if defined(HD44780_USE_8_BIT_MODE) && !defined(HD44780_USE_CUSTOM_PORT)            // if not redefined, then default ports will be used for 8 bit mode
 #define LCD_DATA_PORT GPIOB
 #define LCD_COMMAND_PORT GPIOC
 
@@ -68,7 +59,7 @@ K     GND               Ground for back light
 #define LCD_D5 LL_GPIO_PIN_5
 #define LCD_D6 LL_GPIO_PIN_6
 #define LCD_D7 LL_GPIO_PIN_7
-#endif	//USE_8_BIT_MODE
+#endif    //USE_8_BIT_MODE
 
 /*
  * HD44780 wiring at 4 bit mode
@@ -90,7 +81,7 @@ D7    PB9               Data 7
 A     +3V3              Back light positive power
 K     GND               Ground for back light
 */
-#if defined(USE_4_BIT_MODE)   // if not redefined, then default ports will be used for 4 bit mode
+#if defined(HD44780_USE_4_BIT_MODE) && !defined(HD44780_USE_CUSTOM_PORT)  // if not redefined, then default ports will be used for 4 bit mode
 #define LCD_PORT GPIOA
 
 #define LCD_RS LL_GPIO_PIN_9
